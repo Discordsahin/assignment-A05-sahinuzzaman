@@ -612,6 +612,65 @@
       </aside>
     </div>
 
-    
+    <script>
+      const historyList = document.getElementById("historyList");
+      const favCountEl = document.getElementById("favCount");
+      const copyCountEl = document.getElementById("copyCount");
+      const coinCountEl = document.getElementById("coinCount");
+      let favoriteCount = 0;
+      let copyCount = 0;
+      let coinCount = 100;
+
+      document.addEventListener("click", async (e) => {
+        const cp = e.target.closest(".copy");
+        if (cp) {
+          const num = cp.dataset.number;
+          try {
+            await navigator.clipboard.writeText(num);
+            copyCount++;
+            copyCountEl.textContent = copyCount;
+            alert("Number copied: " + num);
+          } catch {
+            alert("Could not be copied");
+          }
+        }
+        const call = e.target.closest(".call");
+        if (call) {
+          const num = call.dataset.number;
+          const title = call.dataset.title;
+          if (coinCount >= 20) {
+            coinCount -= 20;
+            coinCountEl.textContent = coinCount;
+            const li = document.createElement("li");
+            li.className =
+              "bg-white p-3 rounded-lg border border-border shadow-sm flex items-center justify-between";
+            const timeStr = new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            });
+            li.innerHTML = `<div class="flex flex-col gap-1"><strong class="text-sm">${title}</strong><div class="text-muted text-xs">${num}</div></div><div class="text-muted text-xs text-right min-w-[88px]">${timeStr}</div>`;
+            historyList.prepend(li);
+            alert(`Calling: ${title} ${num}`);
+            window.location.href = "tel:" + num.replace(/[^0-9+]/g, "");
+          } else {
+            alert("Sorry, you don't have enough coins.");
+          }
+        }
+        const favorite = e.target.closest(".favorite");
+        if (favorite) {
+          if (!favorite.classList.contains("liked")) {
+            favorite.classList.add("liked");
+            favorite.innerHTML = `<i class="fa-solid fa-heart"></i>`;
+            favoriteCount++;
+            favCountEl.textContent = favoriteCount;
+          }
+        }
+      });
+      document.getElementById("clearHistory").addEventListener("click", () => {
+        historyList.innerHTML = "";
+        alert("Call history cleared.");
+      });
+    </script>
   </body>
 </html>
